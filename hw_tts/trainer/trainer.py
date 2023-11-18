@@ -12,11 +12,12 @@ import torch.nn.functional as F
 import torchaudio
 from hw_tts.base import BaseTrainer
 from hw_tts.logger.utils import plot_spectrogram_to_buf
-from hw_tts.utils import ROOT_PATH, MetricTracker, inf_loop
+from hw_tts.utils import ROOT_PATH, MetricTracker, inf_loop, get_WaveGlow
 from synt import run_synthesis
 from torch.nn.utils import clip_grad_norm_
 from torchvision.transforms import ToTensor
 from tqdm import tqdm
+from waveglownet.inference import get_wav
 
 
 class Trainer(BaseTrainer):
@@ -53,6 +54,8 @@ class Trainer(BaseTrainer):
         self.log_step = self.config["trainer"].get("log_step", 50)
         self.batch_accum_steps = self.config["trainer"].get("batch_accum_steps", 1)
         self.batch_expand_size = self.config["trainer"]["batch_expand_size"]
+        self.WaveGlow = get_WaveGlow()
+        self.WaveGlow.to(device)
 
         self.train_metrics = MetricTracker(
             "loss", "mel_loss", "duration_loss", "pitch_loss",
@@ -176,12 +179,10 @@ class Trainer(BaseTrainer):
 
         return batch
     
-    def _run_test_synthesis(self, extra_text=None):
-        self.model.eval()
-        run_synthesis(self.model, extra_text.detach().cpu().tolist()) # test is saved in results dir
-        for fname in os.listdir(str(ROOT_PATH / 'results')):
-            audio, sr = torchaudio.load(str(ROOT_PATH / 'results' / fname))
-            self._log_audio(audio, sr, fname)
+    def _synthesis(self, mel):
+        mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
+        audio = get_wav(mel, self.WaveGlow)
+        self._log_audio(audio=audio, sr=22050)
     
 
     def _log_predictions(
@@ -204,7 +205,7 @@ class Trainer(BaseTrainer):
         rows = {}
         i = 0
         for sequence, mel_target, mel_output in tuples[:examples_to_log]:
-            self._run_test_synthesis(extra_text=sequence.unsqueeze(0))
+            self._synthesis(mel_output)
             rows[i] = {
                 "source_text": sequence,
                 "mel_target": mel_target,
