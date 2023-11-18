@@ -150,7 +150,7 @@ def phonemizer():
 
 
 if __name__ == '__main__':
-    # get_energy()
-    # get_pitch()
+    get_energy()
+    get_pitch()
     process()
-    # phonemizer()
+    phonemizer()

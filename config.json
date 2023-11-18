@@ -41,11 +41,11 @@
                 {
                     "type": "LJDataset",
                     "args": {
-                        "mel_ground_truth": "data/mels",
-                        "alignment_path": "data/alignments",
-                        "pitch_path": "data/pitch",
-                        "energy_path": "data/energy",
-                        "data_path": "data/train.txt",
+                        "mel_ground_truth": "/kaggle/input/fastspeecch-dataset/data/data/mels",
+                        "alignment_path": "/kaggle/input/fastspeecch-dataset/data/data/alignments",
+                        "pitch_path": "/kaggle/input/fastspeecch-dataset/data/data/pitch",
+                        "energy_path": "/kaggle/input/fastspeecch-dataset/data/data/energy",
+                        "data_path": "/kaggle/input/fastspeecch-dataset/data/data/train.txt",
                         "text_cleaners": ["english_cleaners"],
                         "batch_expand_size": 24
                     }

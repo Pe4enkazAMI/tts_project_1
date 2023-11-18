@@ -206,7 +206,7 @@ def get_mask_from_lengths(lengths, max_len=None):
 
 def get_WaveGlow():
     waveglow_path = os.path.join("waveglownet", "pretrained_model")
-    waveglow_path = os.path.join("/Users/bayesian_monster/text2speech1/waveglownet/waveglow/pretrained_model",
+    waveglow_path = os.path.join("/kaggle/input/fastspeecch-dataset",
                                   "waveglow_256channels.pt")
     wave_glow = torch.load(waveglow_path)['model']
     wave_glow = wave_glow.remove_weightnorm(wave_glow)
