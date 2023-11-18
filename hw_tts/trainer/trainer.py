@@ -206,14 +206,15 @@ class Trainer(BaseTrainer):
         i = 0
         for sequence, mel_target, mel_output in tuples[:examples_to_log]:
             audio = self._synthesis(mel_output)
-            rows[i] = {
-                "source_text": sequence,
-                "mel_target": mel_target,
-                "mel_pred": mel_output,
-                "synt_audio": self.writer.wandb.Audio(audio.numpy(), sample_rate=22050),
-            }
+            # rows[i] = {
+            #     "source_text": sequence,
+            #     "mel_target": mel_target,
+            #     "mel_pred": mel_output,
+            #     "synt_audio": self.writer.wandb.Audio(audio.numpy(), sample_rate=22050),
+            # }
+            self._log_audio(audio, 22050, "synt")
             i += 1
-        self.writer.add_table("predictions", pd.DataFrame.from_dict(rows, orient="index"))
+        # self.writer.add_table("predictions", pd.DataFrame.from_dict(rows, orient="index"))
 
     def _progress(self, batch_idx):
         base = "[{}/{} ({:.0f}%)]"
