@@ -263,8 +263,9 @@ class FastSpeechModel(nn.Module):
                                                             energy_target=gt_energy, gamma=gamma)
 
             output = self.decoder(output + pitch_emb + energy_emb, mel_pos)
-            output = self.mask_tensor(output, mel_pos, mel_max_length)
+            # output = self.mask_tensor(output, mel_pos, mel_max_length)
             output = self.mel_linear(output)
+            output = self.mask_tensor(output, mel_pos, mel_max_length)
 
             return {"mel_pred": output, 
                     "duration_pred": duration_predictor_output,
