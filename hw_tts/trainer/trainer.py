@@ -207,7 +207,7 @@ class Trainer(BaseTrainer):
         rows = {}
         i = 0
         for sequence, mel_target, mel_output in tuples[:examples_to_log]:
-            audio, audio_2 = self._synthesis(mel_output)
+            audio = self._synthesis(mel_output)
             # rows[i] = {
             #     "source_text": sequence,
             #     "mel_target": mel_target,
