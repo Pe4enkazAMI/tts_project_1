@@ -116,7 +116,6 @@ def get_data_to_buffer(data_path, mel_ground_truth, alignment_path,
     buffer = list()
     text = process_text(data_path)
 
-    start = time.perf_counter()
     for i in tqdm(range(len(text))):
 
         mel_gt_name = os.path.join(
@@ -139,7 +138,6 @@ def get_data_to_buffer(data_path, mel_ground_truth, alignment_path,
             energy_path, "ljspeech-energy-%05d.npy" % (i+1))
         energy = np.load(en_gt_name)
 
-        # character = np.array(_arpabet_to_sequence(character))
 
         character = torch.from_numpy(character)
         duration = torch.from_numpy(duration)
@@ -153,8 +151,6 @@ def get_data_to_buffer(data_path, mel_ground_truth, alignment_path,
                        "mel_target": mel_gt_target,
                        "batch_expand_size": batch_expand_size})
 
-    end = time.perf_counter()
-    print("cost {:.2f}s to load all data into buffer.".format(end-start))
 
     return buffer
 
