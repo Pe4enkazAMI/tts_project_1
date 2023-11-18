@@ -34,8 +34,8 @@
     },
     "data": {
         "train": {
-            "batch_size": 20,
-            "batch_expand_size": 24,
+            "batch_size": 5,
+            "batch_expand_size": 1,
             "num_workers": 5,
             "datasets": [
                 {
@@ -47,7 +47,8 @@
                         "energy_path": "/kaggle/input/fastspeecch-dataset/data/data/energy",
                         "data_path": "/kaggle/input/fastspeecch-dataset/data/data/train.txt",
                         "text_cleaners": ["english_cleaners"],
-                        "batch_expand_size": 24
+                        "batch_expand_size": 1,
+                        "limit": 5
                     }
                 }
             ]
@@ -75,7 +76,7 @@
         }
     },
     "trainer": {
-        "batch_expand_size": 24,
+        "batch_expand_size": 1,
         "epochs": 30,
         "save_dir": "saved/",
         "save_period": 5,
@@ -86,7 +87,7 @@
         "wandb_project": "fastspeech_project",
         "run_name": "pitch_model",
         "sample_rate": 16000,
-        "len_epoch": 3000,
+        "len_epoch": 1000,
         "log_step": 50,
         "grad_norm_clip": 1,
         "batch_accum_steps": 1

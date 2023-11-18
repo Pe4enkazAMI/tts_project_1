@@ -70,7 +70,6 @@ class Trainer(BaseTrainer):
         names = ["src_seq", "gt_mel", "gt_duration", "gt_energy",
                  "mel_pos", "src_pos", "gt_pitch"]
         for tensor_for_gpu in names:
-            print(tensor_for_gpu)
             batch[tensor_for_gpu] = batch[tensor_for_gpu].to(device)
         return batch
 
