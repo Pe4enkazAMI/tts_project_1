@@ -274,6 +274,7 @@ class FastSpeechModel(nn.Module):
                     "energy_pred": energy_predictor_output}
         else:
             output, mel_pos = self.length_regulator(x, alpha)
+            print("HUINYA 3", output.shape)
             pitch_emb, _ = self.get_pitch(output, beta=beta)
             energy_emb, _ = self.get_energy(output, gamma=gamma)
             output = self.decoder(output + pitch_emb + energy_emb, mel_pos)

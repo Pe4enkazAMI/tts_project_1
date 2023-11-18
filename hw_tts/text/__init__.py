@@ -103,5 +103,6 @@ def _arpabet_to_sequence(text):
 def _should_keep_symbol(s):
     result = s in _symbol_to_id and s != '_' and s != '~'
     if not result:
-        print(s, len(s))
+        # print(s, len(s))
+        pass
     return result
