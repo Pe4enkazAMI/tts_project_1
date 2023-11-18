@@ -183,8 +183,8 @@ class Trainer(BaseTrainer):
     def _synthesis(self, mel):
         mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
         audio = get_wav(mel, self.WaveGlow)
-        audio_2 = inv_mel_spec(mel, "kk")
-        return audio, audio_2
+        # audio_2 = inv_mel_spec(mel, "kk")
+        return audio #, audio_2
     
 
     def _log_predictions(
@@ -215,7 +215,7 @@ class Trainer(BaseTrainer):
             #     "synt_audio": self.writer.wandb.Audio(audio.numpy(), sample_rate=22050),
             # }
             self._log_audio(audio, 22050, "synt")
-            self._log_audio(audio_2, 22050, "synt_griffin")
+            # self._log_audio(audio_2, 22050, "synt_griffin")
             i += 1
         # self.writer.add_table("predictions", pd.DataFrame.from_dict(rows, orient="index"))
 
