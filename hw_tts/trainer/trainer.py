@@ -182,7 +182,7 @@ class Trainer(BaseTrainer):
     def _synthesis(self, mel):
         mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
         audio = get_wav(mel, self.WaveGlow)
-        self._log_audio(audio=audio, sr=22050)
+        self._log_audio(audio=audio, sr=22050, name="Synthesis")
     
 
     def _log_predictions(
