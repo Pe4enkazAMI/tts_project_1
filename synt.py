@@ -16,6 +16,7 @@ import hw_tts.model as module_model
 import hw_tts.text as text
 import hw_tts.utils as utils
 import waveglownet
+from waveglownet import inference
 # from src.utils.parse_config import ConfigParser
 
 DEVICE = "cuda:0" if torch.cuda.is_available() else 'cpu'
@@ -102,7 +103,7 @@ def run_synthesis(model, extra_data=None, all=False):
                 for i, phn in tqdm(enumerate(data_list), desc=name, total=len(data_list)):
                     mel, mel_cuda = synthesis(model, phn, alpha=speed, beta=pitch, gamma=energy)
                     
-                    waveglownet.inference.inference(
+                    inference.inference(
                         mel_cuda, WaveGlow,
                         f"results/s={speed}_p={pitch}_e={energy}_t={i}_waveglow.wav"
                     )
