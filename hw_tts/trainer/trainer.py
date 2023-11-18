@@ -18,6 +18,7 @@ from torch.nn.utils import clip_grad_norm_
 from torchvision.transforms import ToTensor
 from tqdm import tqdm
 from waveglownet.inference import get_wav
+from audio.tools import inv_mel_spec
 
 
 class Trainer(BaseTrainer):
@@ -182,7 +183,8 @@ class Trainer(BaseTrainer):
     def _synthesis(self, mel):
         mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
         audio = get_wav(mel, self.WaveGlow)
-        return audio
+        audio_2 = inv_mel_spec(mel, "kk")
+        return audio, audio_2
     
 
     def _log_predictions(
@@ -205,7 +207,7 @@ class Trainer(BaseTrainer):
         rows = {}
         i = 0
         for sequence, mel_target, mel_output in tuples[:examples_to_log]:
-            audio = self._synthesis(mel_output)
+            audio, audio_2 = self._synthesis(mel_output)
             # rows[i] = {
             #     "source_text": sequence,
             #     "mel_target": mel_target,
@@ -213,6 +215,7 @@ class Trainer(BaseTrainer):
             #     "synt_audio": self.writer.wandb.Audio(audio.numpy(), sample_rate=22050),
             # }
             self._log_audio(audio, 22050, "synt")
+            self._log_audio(audio_2, 22050, "synt_griffin")
             i += 1
         # self.writer.add_table("predictions", pd.DataFrame.from_dict(rows, orient="index"))
 

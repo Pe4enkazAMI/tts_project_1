@@ -34,7 +34,7 @@
     },
     "data": {
         "train": {
-            "batch_size": 5,
+            "batch_size": 15,
             "batch_expand_size": 1,
             "num_workers": 5,
             "datasets": [
@@ -48,7 +48,7 @@
                         "data_path": "/kaggle/input/fastspeecch-dataset/data/data/train.txt",
                         "text_cleaners": ["english_cleaners"],
                         "batch_expand_size": 1,
-                        "limit": 5
+                        "limit": 15
                     }
                 }
             ]
@@ -87,7 +87,7 @@
         "wandb_project": "fastspeech_project",
         "run_name": "pitch_model",
         "sample_rate": 16000,
-        "len_epoch": 1000,
+        "len_epoch": 500,
         "log_step": 50,
         "grad_norm_clip": 1,
         "batch_accum_steps": 1
