@@ -140,7 +140,7 @@ class Trainer(BaseTrainer):
             if stop:
                 break
         log = last_train_metrics
-
+        self._log_predictions(**batch)
         return log
 
     def process_batch(self, batch, is_train: bool, metrics: MetricTracker,
@@ -179,10 +179,11 @@ class Trainer(BaseTrainer):
 
         return batch
     
+    @torch.inference_mode()
     def _synthesis(self, mel):
         mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
         audio = get_wav(mel, self.WaveGlow)
-        self._log_audio(audio=audio, sr=22050, name="Synthesis")
+        return audio
     
 
     def _log_predictions(
@@ -205,11 +206,12 @@ class Trainer(BaseTrainer):
         rows = {}
         i = 0
         for sequence, mel_target, mel_output in tuples[:examples_to_log]:
-            self._synthesis(mel_output)
+            audio = self._synthesis(mel_output)
             rows[i] = {
                 "source_text": sequence,
                 "mel_target": mel_target,
                 "mel_pred": mel_output,
+                "synt_audio": self.writer.wandb.Audio(audio.numpy(), sample_rate=22050),
             }
             i += 1
         self.writer.add_table("predictions", pd.DataFrame.from_dict(rows, orient="index"))

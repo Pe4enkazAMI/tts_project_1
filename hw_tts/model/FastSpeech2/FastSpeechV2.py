@@ -251,9 +251,7 @@ class FastSpeechModel(nn.Module):
                 gt_pitch=None, gt_energy=None,
                 alpha=1.0, beta=1.0, gamma=1.0,
                 **kwargs):
-        print("HUINYA 1:", src_seq.shape)
         x, non_pad_mask = self.encoder(src_seq, src_pos)
-        print("HUINYA 2:", x.shape)
         if self.training:
             output, duration_predictor_output = self.length_regulator(x, alpha, 
                                                             gt_duration, mel_max_length)
@@ -274,7 +272,6 @@ class FastSpeechModel(nn.Module):
                     "energy_pred": energy_predictor_output}
         else:
             output, mel_pos = self.length_regulator(x, alpha)
-            print("HUINYA 3", output.shape)
             pitch_emb, _ = self.get_pitch(output, beta=beta)
             energy_emb, _ = self.get_energy(output, gamma=gamma)
             output = self.decoder(output + pitch_emb + energy_emb, mel_pos)
