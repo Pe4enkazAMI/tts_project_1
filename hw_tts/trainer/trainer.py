@@ -203,10 +203,10 @@ class Trainer(BaseTrainer):
         shuffle(tuples)
         rows = {}
         i = 0
-        for src_seq, mel_target, mel_output in tuples[:examples_to_log]:
-            self._run_test_synthesis(extra_text=src_seq)
+        for sequence, mel_target, mel_output in tuples[:examples_to_log]:
+            self._run_test_synthesis(extra_text=sequence.unsqueeze(0))
             rows[i] = {
-                "source_text": src_seq,
+                "source_text": sequence,
                 "mel_target": mel_target,
                 "mel_pred": mel_output,
             }
