@@ -16,20 +16,14 @@ def create_alignment(base_mat, duration_predictor_output):
 
 
 class LengthRegulator(nn.Module):
-    """ Length Regulator """
-
-    def __init__(self, 
-        encoder_dim, 
-        duration_predictor_filter_size,
-        duration_predictor_kernel_size,
-        dropout
-        ):
+    def __init__(self, encoder_dim, duration_predictor_filter_size, duration_predictor_kernel_size, dropout):
         super().__init__()
-        self.duration_predictor = VariancePredictor(encoder_dim, 
-            duration_predictor_filter_size,
-            duration_predictor_kernel_size,
-            dropout
-        )
+        self.duration_predictor = VariancePredictor(
+                                                    encoder_dim, 
+                                                    duration_predictor_filter_size,
+                                                    duration_predictor_kernel_size,
+                                                    dropout
+                                                    )
 
     def LR(self, x, duration_predictor_output, mel_max_length=None):
         expand_max_len = torch.max(torch.sum(duration_predictor_output, -1), -1)[0]
@@ -53,9 +47,9 @@ class LengthRegulator(nn.Module):
             output = self.LR(x, target, mel_max_length)
             return output, duration_predictor_output
         else:
-            # we remove 1 from exp because we estimate (target + 1), also we ensure that min is 0
             duration_predictor_output = (((torch.exp(duration_predictor_output) - 1) * alpha) + 0.5).int()
-            duration_predictor_output[duration_predictor_output < 0] = 0
+            mask = duration_predictor_output < 0
+            duration_predictor_output[mask] = 0
 
             output = self.LR(x, duration_predictor_output)
             mel_pos = torch.stack(
