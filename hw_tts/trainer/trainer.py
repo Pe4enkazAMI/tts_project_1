@@ -228,12 +228,12 @@ class Trainer(BaseTrainer):
     ):
         if self.writer is None:
             return
-        if self.inference_texts is not None:
-            print("Setting up inference")
-            texts = self.inference_texts
-            audios = self.inference(texts)
-            for audio in audios:
-                self._log_audio(audio, 22050, "Inference Synt")
+        # if self.inference_texts is not None:
+        #     print("Setting up inference")
+        #     texts = self.inference_texts
+        #     audios = self.inference(texts)
+        #     for audio in audios:
+        #         self._log_audio(audio, 22050, "Inference Synt")
 
         tuples = list(zip(src_seq, gt_mel, mel_pred))
         shuffle(tuples)

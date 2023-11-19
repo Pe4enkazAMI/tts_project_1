@@ -34,8 +34,8 @@
     },
     "data": {
         "train": {
-            "batch_size": 15,
-            "batch_expand_size": 1,
+            "batch_size": 20,
+            "batch_expand_size": 24,
             "num_workers": 5,
             "datasets": [
                 {
@@ -47,17 +47,14 @@
                         "energy_path": "/kaggle/input/fastspeecch-dataset/data/data/energy",
                         "data_path": "/kaggle/input/fastspeecch-dataset/data/data/train.txt",
                         "text_cleaners": ["english_cleaners"],
-                        "batch_expand_size": 1,
-                        "limit": 15
+                        "batch_expand_size": 24
                     }
                 }
             ]
         }
     },
 
-    "inference_texts": {
-        "texts": ["My name is Sofia Kostina", "I want to kill Kirill Korolev", "Fuck you bitch"]
-    },
+    "inference_texts": {},
     "optimizer": {
         "type": "Adam",
         "args": {
@@ -73,15 +70,15 @@
         "type": "OneCycleLR",
         "args": {
             "steps_per_epoch": 3000,
-            "epochs": 30,
+            "epochs": 120,
             "anneal_strategy": "cos",
             "max_lr": 1e-3,
             "pct_start": 0.1
         }
     },
     "trainer": {
-        "batch_expand_size": 1,
-        "epochs": 30,
+        "batch_expand_size": 24,
+        "epochs": 120,
         "save_dir": "saved/",
         "save_period": 5,
         "verbosity": 2,
@@ -89,9 +86,9 @@
         "early_stop": 50,
         "visualize": "wandb",
         "wandb_project": "fastspeech_project",
-        "run_name": "pitch_model",
+        "run_name": "MyanSpeech2",
         "sample_rate": 16000,
-        "len_epoch": 500,
+        "len_epoch": 3000,
         "log_step": 50,
         "grad_norm_clip": 1,
         "batch_accum_steps": 1
