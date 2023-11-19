@@ -4,7 +4,7 @@ import random
 from pathlib import Path
 from random import shuffle
 from typing import Optional
-
+import numpy as np
 import pandas as pd
 import PIL
 import torch
@@ -43,6 +43,7 @@ class Trainer(BaseTrainer):
         self.skip_oom = skip_oom
         self.config = config
         self.train_dataloader = dataloaders["train"]
+        self.inference_texts = self.config["inference_texts"].get("text", None)
         if len_epoch is None:
             # epoch-based training
             self.len_epoch = len(self.train_dataloader)
@@ -186,6 +187,31 @@ class Trainer(BaseTrainer):
         # audio_2 = inv_mel_spec(mel, "kk")
         return audio #, audio_2
     
+    def make_src_pos_for_inference(self, texts):
+        length_text = np.array([])
+        for text in texts:
+            length_text = np.append(length_text, text.size(0))
+        src_pos = list()
+        max_len = int(max(length_text))
+        for length_src_row in length_text:
+            src_pos.append(np.pad([i+1 for i in range(int(length_src_row))],
+                              (0, max_len-int(length_src_row)), 'constant'))
+        src_pos = torch.from_numpy(np.array(src_pos))
+        return {"src_seq_inference": texts, "src_pos_inference": src_pos}
+    
+    @torch.inference_mode()
+    def inference(self, texts):
+        self.model.eval()
+        inference_batch = self.make_src_pos_for_inference(texts)
+        mel_out = self.model(src_seq=inference_batch["src_seq_inference"],
+                             src_pos=inference_batch["src_pos_inference"])["mel_output"]
+        audios = []
+        for i in range(len(texts)):
+            mel = mel_out[i, ...]
+            mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
+            audio = get_wav(mel, self.WaveGlow)
+            audios += audio
+        return audios 
 
     def _log_predictions(
             self,
@@ -202,22 +228,19 @@ class Trainer(BaseTrainer):
     ):
         if self.writer is None:
             return
+        if self.inference_texts is not None:
+            texts = self.inference_texts
+            audios = self.inference(texts)
         tuples = list(zip(src_seq, gt_mel, mel_pred))
         shuffle(tuples)
         rows = {}
         i = 0
+        for audio in audios:
+            self._log_audio(audio, 22050, "Inference Synt")
         for sequence, mel_target, mel_output in tuples[:examples_to_log]:
             audio = self._synthesis(mel_output)
-            # rows[i] = {
-            #     "source_text": sequence,
-            #     "mel_target": mel_target,
-            #     "mel_pred": mel_output,
-            #     "synt_audio": self.writer.wandb.Audio(audio.numpy(), sample_rate=22050),
-            # }
-            self._log_audio(audio, 22050, "synt")
-            # self._log_audio(audio_2, 22050, "synt_griffin")
+            self._log_audio(audio, 22050, "Train Synt")
             i += 1
-        # self.writer.add_table("predictions", pd.DataFrame.from_dict(rows, orient="index"))
 
     def _progress(self, batch_idx):
         base = "[{}/{} ({:.0f}%)]"

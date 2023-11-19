@@ -54,6 +54,10 @@
             ]
         }
     },
+
+    "inference_texts": {
+        "texts": ["My name is Sofia Kostina", "I want to kill Kirill Korolev", "Fuck you bitch"]
+    },
     "optimizer": {
         "type": "Adam",
         "args": {
