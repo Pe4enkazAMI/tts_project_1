@@ -49,12 +49,10 @@ class MultiHeadAttention(nn.Module):
         self.reset_parameters()
 
     def reset_parameters(self):
-        nn.init.xavier_normal_(self.w_qs.weight, mean=0,
-                        std=np.sqrt(2.0 / (self.d_model + self.d_k)))
-        nn.init.xavier_normal_(self.w_ks.weight, mean=0,
-                        std=np.sqrt(2.0 / (self.d_model + self.d_k)))
-        nn.init.xavier_normal_(self.w_vs.weight, mean=0,
-                        std=np.sqrt(2.0 / (self.d_model + self.d_v))) 
+        nn.init.xavier_uniform_(self.qkv.weight)
+        self.qkv.bias.data.fill_(0)
+        nn.init.xavier_uniform_(self.out.weight)
+        self.out.bias.data.fill_(0)
         
     def forward(self, x, mask=None):
         residual = x 
@@ -67,7 +65,7 @@ class MultiHeadAttention(nn.Module):
 
         if mask is not None:
             mask = mask.unsqueeze(1).repeat(1, self.n_head, 1, 1)   # b x n x .. x ..
-            
+
         output, attn = self.attention(q, k, v, mask=mask)
         output = output.permute(0, 2, 1, 3)
         output = output.reshape(bs, seq_len, self.d_model)
