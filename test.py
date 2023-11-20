@@ -21,13 +21,13 @@ DEFAULT_CHECKPOINT_PATH = ROOT_PATH / "default_test_model" / "checkpoint.pth"
 
     
 @torch.inference_mode()
-def inference(model, texts, wave_glow):
+def inference(model, texts, wave_glow, device):
     model.eval()
     t = text_to_sequence(texts[1], ["english_cleaners"])
     t_len = len(t) 
     t_pos = list(np.pad([i+1 for i in range(int(t_len))], (0, 0), 'constant'))
     t_pos = torch.from_numpy(np.array(t_pos))
-    mel_out = model(src_seq=torch.tensor(t).to(model.device), src_pos=t_len)["mel_output"]
+    mel_out = model(src_seq=torch.tensor(t).to(device), src_pos=t_pos.to(device))["mel_output"]
     mel = mel_out[0, ...]
     mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
     audio = get_wav(mel, wave_glow)
@@ -64,7 +64,7 @@ def main(config, out_file):
     with torch.no_grad():
         audios = []
         for text in enumerate(tqdm(config["test_texts"])):
-            audio = inference(model, text, WaveGlow)
+            audio = inference(model, text, WaveGlow, device)
             audios += [audio]
 
     i = 0
