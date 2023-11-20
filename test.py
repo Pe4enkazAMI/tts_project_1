@@ -60,6 +60,7 @@ def main(config, out_file):
     WaveGlow = get_WaveGlow()
     WaveGlow.to(device)
 
+    print(config["test_texts"])
     with torch.no_grad():
         audios = []
         for text in enumerate(tqdm(config["test_texts"])):
