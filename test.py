@@ -35,7 +35,7 @@ def make_src_pos_for_inference(texts):
 def inference(model, texts, wave_glow):
     model.eval()
     print(texts)
-    t = text_to_sequence(texts, ["english_cleaners"])
+    t = text_to_sequence(texts[1], ["english_cleaners"])
     inference_batch = make_src_pos_for_inference(t)
     mel_out = model(src_seq=inference_batch["src_seq_inference"],
                         src_pos=inference_batch["src_pos_inference"])["mel_output"]
