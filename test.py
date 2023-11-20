@@ -63,7 +63,7 @@ def main(config, out_file):
     testing = ["From the river to the sea Palestine will be free!"]
     with torch.no_grad():
         audios = []
-        for text in enumerate(tqdm(config["test_texts"])):
+        for text in enumerate(tqdm(testing)):
             audio = inference(model, text, WaveGlow, device)
             audios += [audio]
 
