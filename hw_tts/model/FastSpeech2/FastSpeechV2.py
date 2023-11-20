@@ -245,6 +245,18 @@ class FastSpeechModel(nn.Module):
 
         emb = self.energy_emb(buckets)
         return emb, energy_predictor_output
+    
+    def get_entity(self, x, predictor, space, entity_emb, target=None, scale=1.0):
+        entity_predictor_output = predictor(x)
+
+        if target is not None:
+            buckets = torch.bucketize(torch.log(target + 1), space)
+        else:
+            estimated_entity = torch.exp(entity_predictor_output) - 1
+            estimated_entity = estimated_entity * scale
+            buckets = torch.bucketize(torch.log(estimated_entity + 1), space)
+        emb = entity_emb(buckets)
+        return emb, entity_predictor_output
 
     def forward(self, src_seq, src_pos, mel_pos=None,
                 mel_max_length=None, gt_duration=None, 
@@ -256,11 +268,24 @@ class FastSpeechModel(nn.Module):
             output, duration_predictor_output = self.length_regulator(x, alpha, 
                                                             gt_duration, mel_max_length)
 
-            pitch_emb, pitch_predictor_output = self.get_pitch(output, 
-                                                               pitch_target=gt_pitch, beta=beta)
+            # pitch_emb, pitch_predictor_output = self.get_pitch(output, 
+            #                                                    pitch_target=gt_pitch, beta=beta)
+            
+            pitch_emb, pitch_predictor_output = self.get_entity(x=output,
+                                                                predictor=self.pitch_predictor,
+                                                                space=self.pitch_space,
+                                                                entity_emb=self.pitch_emb,
+                                                                scale=beta)
 
-            energy_emb, energy_predictor_output = self.get_energy(output, 
-                                                            energy_target=gt_energy, gamma=gamma)
+            # energy_emb, energy_predictor_output = self.get_energy(output, 
+            #                                                 energy_target=gt_energy, gamma=gamma)
+            
+            energy_emb, energy_predictor_output = self.get_entity(x=output,
+                                                            predictor=self.energy_predictor,
+                                                            space=self.energy_space,
+                                                            entity_emb=self.energy_emb,
+                                                            scale=gamma)
+            
 
             output = self.decoder(output + pitch_emb + energy_emb, mel_pos)
             output = self.mask_tensor(output, mel_pos, mel_max_length)
