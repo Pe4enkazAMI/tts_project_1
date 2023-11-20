@@ -19,6 +19,7 @@ from torchvision.transforms import ToTensor
 from tqdm import tqdm
 from waveglownet.inference import get_wav
 from audio.tools import inv_mel_spec
+import hw_tts.text as text
 
 
 class Trainer(BaseTrainer):
@@ -189,8 +190,7 @@ class Trainer(BaseTrainer):
     
     def make_src_pos_for_inference(self, texts):
         length_text = np.array([])
-        for text in texts:
-            length_text = np.append(length_text, text.size(0))
+        length_text = np.append(length_text, texts.size(0))
         src_pos = list()
         max_len = int(max(length_text))
         for length_src_row in length_text:
@@ -202,11 +202,12 @@ class Trainer(BaseTrainer):
     @torch.inference_mode()
     def inference(self, texts):
         self.model.eval()
-        inference_batch = self.make_src_pos_for_inference(texts)
-        mel_out = self.model(src_seq=inference_batch["src_seq_inference"],
-                             src_pos=inference_batch["src_pos_inference"])["mel_output"]
         audios = []
         for i in range(len(texts)):
+            t = text.text_to_sequence(texts[i], ["english_cleaners"])
+            inference_batch = self.make_src_pos_for_inference(t)
+            mel_out = self.model(src_seq=inference_batch["src_seq_inference"],
+                             src_pos=inference_batch["src_pos_inference"])["mel_output"]
             mel = mel_out[i, ...]
             mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
             audio = get_wav(mel, self.WaveGlow)
