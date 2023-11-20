@@ -72,6 +72,7 @@ def main(config, out_file):
         path_to_save = Path(f"/kaggle/working/{i}.wav")
         print("SHAPE:", audio.shape)
         torchaudio.save(path_to_save, audio.unsqueeze(0), sample_rate=22050)
+        i += 1
             
         
 
