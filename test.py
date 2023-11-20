@@ -36,7 +36,7 @@ def inference(model, texts, wave_glow):
     model.eval()
     print(texts)
     t = text_to_sequence(texts[1], ["english_cleaners"])
-    inference_batch = make_src_pos_for_inference(t)
+    inference_batch = make_src_pos_for_inference(torch.tensor(t))
     mel_out = model(src_seq=inference_batch["src_seq_inference"],
                         src_pos=inference_batch["src_pos_inference"])["mel_output"]
     mel = mel_out[0, ...]
