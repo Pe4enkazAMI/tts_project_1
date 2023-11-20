@@ -19,30 +19,20 @@ import torchaudio
 
 DEFAULT_CHECKPOINT_PATH = ROOT_PATH / "default_test_model" / "checkpoint.pth"
 
-
-def make_src_pos_for_inference(texts):
-        length_text = np.array([])
-        length_text = np.append(length_text, texts.size(0))
-        src_pos = list()
-        max_len = int(max(length_text))
-        for length_src_row in length_text:
-            src_pos.append(np.pad([i+1 for i in range(int(length_src_row))],
-                              (0, max_len-int(length_src_row)), 'constant'))
-        src_pos = torch.from_numpy(np.array(src_pos))
-        return {"src_seq_inference": texts, "src_pos_inference": src_pos}
     
 @torch.inference_mode()
 def inference(model, texts, wave_glow):
     model.eval()
     print(texts)
     t = text_to_sequence(texts[1], ["english_cleaners"])
-    inference_batch = make_src_pos_for_inference(torch.tensor(t))
-    mel_out = model(src_seq=inference_batch["src_seq_inference"],
-                        src_pos=inference_batch["src_pos_inference"])["mel_output"]
-    mel = mel_out[0, ...]
-    mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
-    audio = get_wav(mel, wave_glow)
-    return audio
+    print(text_to_sequence)
+    return 0
+    # mel_out = model(src_seq=inference_batch["src_seq_inference"],
+    #                     src_pos=inference_batch["src_pos_inference"])["mel_output"]
+    # mel = mel_out[0, ...]
+    # mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
+    # audio = get_wav(mel, wave_glow)
+    # return audio
 
 
 def main(config, out_file):
