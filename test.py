@@ -174,8 +174,8 @@ if __name__ == "__main__":
             }
         }
 
-    assert config.config.get("data", {}).get("test", None) is not None
-    config["data"]["test"]["batch_size"] = args.batch_size
-    config["data"]["test"]["n_jobs"] = args.jobs
+    # assert config.config.get("data", {}).get("test", None) is not None
+    # config["data"]["test"]["batch_size"] = args.batch_size
+    # config["data"]["test"]["n_jobs"] = args.jobs
 
     main(config, args.output)
