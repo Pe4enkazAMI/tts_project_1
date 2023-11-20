@@ -27,7 +27,7 @@ def inference(model, texts, wave_glow, device):
     t_len = len(t) 
     t_pos = list(np.pad([i+1 for i in range(int(t_len))], (0, 0), 'constant'))
     t_pos = torch.from_numpy(np.array(t_pos))
-    mel_out = model(src_seq=torch.tensor(t).to(device), src_pos=t_pos.to(device))["mel_output"]
+    mel_out = model(src_seq=torch.tensor(t).to(device).unsqueeze(0), src_pos=t_pos.to(device).unsqueeze(0))["mel_output"]
     mel = mel_out[0, ...]
     mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
     audio = get_wav(mel, wave_glow)
