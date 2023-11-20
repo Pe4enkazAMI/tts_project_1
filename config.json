@@ -53,8 +53,8 @@
             ]
         }
     },
-
-    "inference_texts": {},
+    "test_texts": ["My name is Kirill Korolev and i am going to smash your head with my precious hammer",
+                   "English you speak it motherfucker", "pull up on the tank and e ya edu v boi" ],
     "optimizer": {
         "type": "Adam",
         "args": {
