@@ -60,10 +60,16 @@ def main(config, out_file):
     WaveGlow = get_WaveGlow()
     WaveGlow.to(device)
 
-
+    texting = [
+        "Oh Ah Yeah fuck me fuck my pussy yes",
+        "My name is Eva Neudachina",
+        "Yarik's dick is so big",
+        "fuck me hard",
+        "i hate niggers"
+    ]
     with torch.no_grad():
         audios = []
-        for text in enumerate(tqdm(config["test_texts"])):
+        for text in enumerate(tqdm(texting)):
             audio = inference(model, text, WaveGlow, device)
             audios += [audio]
 
