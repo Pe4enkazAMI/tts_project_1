@@ -73,7 +73,7 @@ def main(config, out_file):
 
     with torch.no_grad():
         audios = []
-        for text in enumerate(tqdm(config["test_text"])):
+        for text in enumerate(tqdm(config["test_texts"])):
             audio = inference(model, text, WaveGlow)
             audios += [audio]
 
