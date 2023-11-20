@@ -60,7 +60,7 @@ def main(config, out_file):
     WaveGlow = get_WaveGlow()
     WaveGlow.to(device)
 
-    print(config["test_texts"])
+    testing = ["From the river to the sea Palestine will be free!"]
     with torch.no_grad():
         audios = []
         for text in enumerate(tqdm(config["test_texts"])):
@@ -70,7 +70,6 @@ def main(config, out_file):
     i = 0
     for audio in audios:
         path_to_save = Path(f"/kaggle/working/{i}.wav")
-        print("SHAPE:", audio.shape)
         torchaudio.save(path_to_save, audio.unsqueeze(0), sample_rate=22050)
         i += 1
             
@@ -131,7 +130,7 @@ if __name__ == "__main__":
         '-tts',
         '--test_texts',
         default="FUCK ME HARD",
-        type=list,
+        type=str,
         help="Text to generate"
 
     )
@@ -177,6 +176,5 @@ if __name__ == "__main__":
     # assert config.config.get("data", {}).get("test", None) is not None
     # config["data"]["test"]["batch_size"] = args.batch_size
     # config["data"]["test"]["n_jobs"] = args.jobs
-    config.config["test_texts"] = args.test_texts
 
     main(config, args.output)
