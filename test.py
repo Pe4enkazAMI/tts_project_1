@@ -23,16 +23,15 @@ DEFAULT_CHECKPOINT_PATH = ROOT_PATH / "default_test_model" / "checkpoint.pth"
 @torch.inference_mode()
 def inference(model, texts, wave_glow):
     model.eval()
-    print(texts)
     t = text_to_sequence(texts[1], ["english_cleaners"])
-    print(t)
-    return 0
-    # mel_out = model(src_seq=inference_batch["src_seq_inference"],
-    #                     src_pos=inference_batch["src_pos_inference"])["mel_output"]
-    # mel = mel_out[0, ...]
-    # mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
-    # audio = get_wav(mel, wave_glow)
-    # return audio
+    t_len = t.shape[-1] 
+    t_pos = list(np.pad([i+1 for i in range(int(t_len))], (0, 0), 'constant'))
+    t_pos = torch.from_numpy(np.array(t_pos))
+    mel_out = model(src_seq=t, src_pos=t_len)["mel_output"]
+    mel = mel_out[0, ...]
+    mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
+    audio = get_wav(mel, wave_glow)
+    return audio
 
 
 def main(config, out_file):
