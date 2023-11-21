@@ -56,10 +56,11 @@
     "test_texts": ["My name is Kirill Korolev and i am going to smash your head with my precious hammer",
                    "English you speak it motherfucker", "pull up on the tank and e ya edu v boi" ],
     "optimizer": {
-        "type": "Adam",
+        "type": "AdamW",
         "args": {
-            "lr": 1e-3,
-            "weight_decay": 1e-6
+            "lr": 3e-4,
+            "weight_decay": 1e-6,
+            "eps": 1e-7
         }
     },
     "loss": {
@@ -70,15 +71,15 @@
         "type": "OneCycleLR",
         "args": {
             "steps_per_epoch": 3000,
-            "epochs": 120,
+            "epochs": 48,
             "anneal_strategy": "cos",
-            "max_lr": 1e-3,
+            "max_lr": 3e-4,
             "pct_start": 0.1
         }
     },
     "trainer": {
         "batch_expand_size": 24,
-        "epochs": 120,
+        "epochs": 48,
         "save_dir": "saved/",
         "save_period": 5,
         "verbosity": 2,
@@ -86,8 +87,8 @@
         "early_stop": 50,
         "visualize": "wandb",
         "wandb_project": "fastspeech_project",
-        "run_name": "MyanSpeech2",
-        "sample_rate": 16000,
+        "run_name": "MyanSpeech2_fast_epoch",
+        "sample_rate": 22050,
         "len_epoch": 3000,
         "log_step": 50,
         "grad_norm_clip": 1,
