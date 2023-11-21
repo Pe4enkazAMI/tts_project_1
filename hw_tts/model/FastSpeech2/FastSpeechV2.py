@@ -266,8 +266,16 @@ class FastSpeechModel(nn.Module):
                     "energy_pred": energy_predictor_output}
         else:
             output, mel_pos = self.length_regulator(x, alpha)
-            pitch_emb, _ = self.get_pitch(output, beta=beta)
-            energy_emb, _ = self.get_energy(output, gamma=gamma)
+            pitch_emb, _ = self.get_entity(x=output,
+                                           predictor=self.pitch_predictor,
+                                            space=self.pitch_space,
+                                             entity_emb=self.pitch_emb,
+                                               scale=beta)
+            energy_emb, _ = self.get_entity(x=output,
+                                            predictor=self.energy_predictor,
+                                             space=self.energy_space,
+                                              entity_emb=self.energy_emb,
+                                               scale=gamma)
             output = self.decoder(output + pitch_emb + energy_emb, mel_pos)
             output = self.mel_linear(output)
             return {"mel_output": output}
