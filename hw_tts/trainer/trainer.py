@@ -42,7 +42,6 @@ class Trainer(BaseTrainer):
         self.skip_oom = skip_oom
         self.config = config
         self.train_dataloader = dataloaders["train"]
-        self.inference_texts = self.config["inference_texts"].get("texts", None)
         if len_epoch is None:
             # epoch-based training
             self.len_epoch = len(self.train_dataloader)
@@ -226,16 +225,10 @@ class Trainer(BaseTrainer):
     ):
         if self.writer is None:
             return
-        # if self.inference_texts is not None:
-        #     print("Setting up inference")
-        #     texts = self.inference_texts
-        #     audios = self.inference(texts)
-        #     for audio in audios:
-        #         self._log_audio(audio, 22050, "Inference Synt")
 
         tuples = list(zip(src_seq, gt_mel, mel_pred))
         shuffle(tuples)
-        for sequence, mel_target, mel_output in tuples[:examples_to_log]:
+        for __, _, mel_output in tuples[:examples_to_log]:
             audio = self._synthesis(mel_output)
             self._log_audio(audio, 22050, "Train Synt")
 
