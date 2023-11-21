@@ -20,7 +20,7 @@ class Encoder(nn.Module):
         PAD,
         dropout
         ):
-        super(Encoder, self).__init__()
+        super().__init__()
         
         len_max_seq= max_seq_len
         n_position = len_max_seq + 1
@@ -83,7 +83,7 @@ class Decoder(nn.Module):
         PAD,
         dropout):
 
-        super(Decoder, self).__init__()
+        super().__init__()
 
         len_max_seq=max_seq_len
         n_position = len_max_seq + 1
@@ -133,32 +133,33 @@ class Decoder(nn.Module):
 class FastSpeechModel(nn.Module):
     """ FastSpeech """
 
-    def __init__(self, max_seq_len,
-        encoder_n_layer,
-        decoder_n_layer,
-        vocab_size,
-        encoder_dim,
-        encoder_head,
-        encoder_filter_size,
-        decoder_dim,
-        decoder_head,
-        decoder_filter_size,
-        fft_kernel,
-        fft_padding,
-        duration_predictor_filter_size,
-        duration_predictor_kernel_size,
-        pitch_predictor_filter_size,
-        pitch_predictor_kernel_size,
-        energy_predictor_filter_size,
-        energy_predictor_kernel_size,
-        min_pitch,
-        max_pitch,
-        min_energy,
-        max_energy,
-        num_bins,
-        num_mels,
-        PAD,
-        dropout
+    def __init__(self, 
+                 max_seq_len,
+                 encoder_n_layer,
+                 decoder_n_layer,
+                 vocab_size,
+                 encoder_dim,
+                 encoder_head,
+                 encoder_filter_size,
+                 decoder_dim,
+                 decoder_head,
+                 decoder_filter_size,
+                 fft_kernel,
+                 fft_padding,
+                 duration_predictor_filter_size,
+                 duration_predictor_kernel_size,
+                 pitch_predictor_filter_size,
+                 pitch_predictor_kernel_size,
+                 energy_predictor_filter_size,
+                 energy_predictor_kernel_size,
+                 min_pitch,
+                 max_pitch,
+                 min_energy,
+                 max_energy,
+                 num_bins=256,
+                 num_mels=80,
+                 PAD=0,
+                 dropout=0.1
         ):
         super().__init__()
 
@@ -218,33 +219,6 @@ class FastSpeechModel(nn.Module):
         mask = ~get_mask_from_lengths(lengths, max_len=mel_max_length)
         mask = mask.unsqueeze(-1).expand(-1, -1, mel_output.size(-1))
         return mel_output.masked_fill(mask, 0.)
-
-    def get_pitch(self, x, pitch_target=None, beta=1.0):
-        pitch_predictor_output = self.pitch_predictor(x)
-        
-        # we estimate pitch_target + 1 to avoid nans
-        if pitch_target is not None:
-            buckets = torch.bucketize(torch.log(pitch_target + 1), self.pitch_space)
-        else:
-            estimated_pitch = torch.exp(pitch_predictor_output) - 1 # (pitch_target + 1) - 1
-            estimated_pitch = estimated_pitch * beta # pitch_target * beta
-            buckets = torch.bucketize(torch.log(estimated_pitch + 1), self.pitch_space)
-        emb = self.pitch_emb(buckets)
-        return emb, pitch_predictor_output
-
-    def get_energy(self, x, energy_target=None, gamma=1.0):
-        energy_predictor_output = self.energy_predictor(x)
-        
-        # we estimate energy_target + 1 to avoid nans
-        if energy_target is not None:
-            buckets = torch.bucketize(torch.log(energy_target + 1), self.energy_space)
-        else:
-            estimated_energy = torch.exp(energy_predictor_output) - 1 # (energy_target + 1) - 1
-            estimated_energy = estimated_energy * gamma # energy_target * gamma
-            buckets = torch.bucketize(torch.log(estimated_energy + 1), self.energy_space)
-
-        emb = self.energy_emb(buckets)
-        return emb, energy_predictor_output
     
     def get_entity(self, x, predictor, space, entity_emb, target=None, scale=1.0):
         entity_predictor_output = predictor(x)
@@ -267,18 +241,12 @@ class FastSpeechModel(nn.Module):
         if self.training:
             output, duration_predictor_output = self.length_regulator(x, alpha, 
                                                             gt_duration, mel_max_length)
-
-            # pitch_emb, pitch_predictor_output = self.get_pitch(output, 
-            #                                                    pitch_target=gt_pitch, beta=beta)
             
             pitch_emb, pitch_predictor_output = self.get_entity(x=output,
                                                                 predictor=self.pitch_predictor,
                                                                 space=self.pitch_space,
                                                                 entity_emb=self.pitch_emb,
                                                                 scale=beta)
-
-            # energy_emb, energy_predictor_output = self.get_energy(output, 
-            #                                                 energy_target=gt_energy, gamma=gamma)
             
             energy_emb, energy_predictor_output = self.get_entity(x=output,
                                                             predictor=self.energy_predictor,

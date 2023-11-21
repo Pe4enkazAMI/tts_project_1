@@ -13,12 +13,10 @@ import torchaudio
 from hw_tts.base import BaseTrainer
 from hw_tts.logger.utils import plot_spectrogram_to_buf
 from hw_tts.utils import ROOT_PATH, MetricTracker, inf_loop, get_WaveGlow
-from synt import run_synthesis
 from torch.nn.utils import clip_grad_norm_
 from torchvision.transforms import ToTensor
 from tqdm import tqdm
 from waveglownet.inference import get_wav
-from audio.tools import inv_mel_spec
 import hw_tts.text as text
 
 
@@ -185,8 +183,7 @@ class Trainer(BaseTrainer):
     def _synthesis(self, mel):
         mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
         audio = get_wav(mel, self.WaveGlow)
-        # audio_2 = inv_mel_spec(mel, "kk")
-        return audio #, audio_2
+        return audio
     
     def make_src_pos_for_inference(self, texts):
         length_text = np.array([])
