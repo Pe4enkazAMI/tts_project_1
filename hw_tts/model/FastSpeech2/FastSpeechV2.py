@@ -243,16 +243,18 @@ class FastSpeechModel(nn.Module):
                                                             gt_duration, mel_max_length)
             
             pitch_emb, pitch_predictor_output = self.get_entity(x=output,
+                                                                target=gt_pitch,
                                                                 predictor=self.pitch_predictor,
                                                                 space=self.pitch_space,
                                                                 entity_emb=self.pitch_emb,
                                                                 scale=beta)
             
             energy_emb, energy_predictor_output = self.get_entity(x=output,
-                                                            predictor=self.energy_predictor,
-                                                            space=self.energy_space,
-                                                            entity_emb=self.energy_emb,
-                                                            scale=gamma)
+                                                                  target=gt_energy,
+                                                                  predictor=self.energy_predictor,
+                                                                  space=self.energy_space,
+                                                                  entity_emb=self.energy_emb,
+                                                                  scale=gamma)
             
 
             output = self.decoder(output + pitch_emb + energy_emb, mel_pos)
