@@ -53,11 +53,9 @@ class Encoder(nn.Module):
 
         enc_slf_attn_list = []
 
-        # -- Prepare masks
         slf_attn_mask = get_attn_key_pad_mask(seq_k=src_seq, seq_q=src_seq, PAD=self.PAD)
         non_pad_mask = get_non_pad_mask(src_seq, self.PAD)
         
-        # -- Forward
         enc_output = self.src_word_emb(src_seq) + self.position_enc(src_pos)
 
         for enc_layer in self.layer_stack:
@@ -112,11 +110,9 @@ class Decoder(nn.Module):
 
         dec_slf_attn_list = []
 
-        # -- Prepare masks
         slf_attn_mask = get_attn_key_pad_mask(seq_k=enc_pos, seq_q=enc_pos, PAD=self.PAD)
         non_pad_mask = get_non_pad_mask(enc_pos, self.PAD)
 
-        # -- Forward
         dec_output = enc_seq + self.position_enc(enc_pos)
 
         for dec_layer in self.layer_stack:
@@ -192,7 +188,6 @@ class FastSpeechModel(nn.Module):
 
         self.mel_linear = nn.Linear(decoder_dim, num_mels)
 
-        # we estimane pitch_target + 1, so we add +1 to bounds
         pitch_space = torch.linspace(np.log(min_pitch + 1), np.log(max_pitch + 2), num_bins)
         self.register_buffer('pitch_space', pitch_space)
 
@@ -203,7 +198,6 @@ class FastSpeechModel(nn.Module):
             dropout
         )
 
-        # we estimane energy_target + 1, so we add +1 to bounds
         energy_space = torch.linspace(np.log(min_energy + 1), np.log(max_energy + 2), num_bins)
         self.register_buffer('energy_space', energy_space)
 
@@ -299,11 +293,10 @@ def get_non_pad_mask(seq, PAD):
 
 def get_attn_key_pad_mask(seq_k, seq_q, PAD):
     ''' For masking out the padding part of key sequence. '''
-    # Expand to fit the shape of key query attention matrix.
     len_q = seq_q.size(1)
     padding_mask = seq_k.eq(PAD)
     padding_mask = padding_mask.unsqueeze(
-        1).expand(-1, len_q, -1)  # b x lq x lk
+        1).expand(-1, len_q, -1)
 
     return padding_mask
 

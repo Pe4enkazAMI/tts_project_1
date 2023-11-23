@@ -87,8 +87,9 @@ def main(config, out_file):
                                             device, 
                                             speed=speed, 
                                             pitch=pitch, 
-                                            energy=energy)               
-                        writer.add_audio(f"{filename}", audio, sample_rate=22050)
+                                            energy=energy)
+                        path_to_save = Path(f"../{filename}.wav")                
+                        torchaudio.save(path_to_save, audio.unsqueeze(0), sample_rate=22050)
         
         
 
