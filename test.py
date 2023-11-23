@@ -76,7 +76,7 @@ def main(config, out_file):
             for speed in speeds:
                 for pitch in pithces:
                     for energy in energies:
-                        filename = f'{text[:5]}_{speed}_{pitch}_{energy}'
+                        filename = f'{text[0][:5]}_{speed}_{pitch}_{energy}'
 
                         audio = inference(model,
                                             text,
@@ -85,7 +85,7 @@ def main(config, out_file):
                                             speed=speed, 
                                             pitch=pitch, 
                                             energy=energy)
-                        path_to_save = Path(f"/kaggle/working/{filename}.wav")                
+                        path_to_save = Path(f"/kaggle/working/audios/{filename}.wav")                
                         torchaudio.save(path_to_save, audio.unsqueeze(0), sample_rate=22050)
         
         
