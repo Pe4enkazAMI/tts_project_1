@@ -206,7 +206,7 @@ def get_WaveGlow():
                                   "waveglow_256channels.pt")
     wave_glow = torch.load(waveglow_path, map_location="cpu")['model']
     wave_glow = wave_glow.remove_weightnorm(wave_glow)
-    wave_glow.cuda().eval()
+    wave_glow.cpu().eval()
     for m in wave_glow.modules():
         if 'Conv' in str(type(m)):
             setattr(m, 'padding_mode', 'zeros')
