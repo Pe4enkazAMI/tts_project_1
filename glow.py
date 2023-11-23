@@ -267,7 +267,7 @@ class WaveGlow(torch.nn.Module):
                                           self.n_remaining_channels,
                                           spect.size(2)).normal_()
         else:
-            audio = torch.FloatTensor(spect.size(0),
+            audio = torch.cuda.FloatTensor(spect.size(0),
                                            self.n_remaining_channels,
                                            spect.size(2)).normal_()
 
@@ -291,7 +291,7 @@ class WaveGlow(torch.nn.Module):
                     z = torch.cuda.HalfTensor(spect.size(
                         0), self.n_early_size, spect.size(2)).normal_()
                 else:
-                    z = torch.FloatTensor(spect.size(
+                    z = torch.cuda.FloatTensor(spect.size(
                         0), self.n_early_size, spect.size(2)).normal_()
                 audio = torch.cat((sigma*z, audio), 1)
 

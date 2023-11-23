@@ -277,7 +277,6 @@ class FastSpeechModel(nn.Module):
                                              space=self.energy_space,
                                               entity_emb=self.energy_emb,
                                                scale=gamma)
-            print("SHAPES:", output.shape, pitch_emb.shape, energy_emb.shape)
             output = self.decoder(output + pitch_emb + energy_emb, mel_pos)
             output = self.mel_linear(output)
             return {"mel_output": output}

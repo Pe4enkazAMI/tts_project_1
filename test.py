@@ -68,9 +68,9 @@ def main(config, out_file):
         "Massachusetts Institute of Technology may be best known for its math, science and engineering education",
         "Wasserstein distance or Kantorovich Rubinstein metric is a distance function defined between probability distributions on a given metric space",
     ]
-    speeds = [0.8, 1, 1.2]
-    pithces = [0.8, 1, 1.2]
-    energies = [0.8, 1, 1.2]
+    speeds = [0.8, 1, 1]
+    pithces = [0.8, 1, 1]
+    energies = [0.8, 1, 1]
     with torch.no_grad():
         for text in enumerate(tqdm(testing)):
             for speed in speeds:
