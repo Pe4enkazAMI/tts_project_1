@@ -267,7 +267,7 @@ class WaveGlow(torch.nn.Module):
                                           self.n_remaining_channels,
                                           spect.size(2)).normal_()
         else:
-            audio = torch.cuda.FloatTensor(spect.size(0),
+            audio = torch.FloatTensor(spect.size(0),
                                            self.n_remaining_channels,
                                            spect.size(2)).normal_()
 
