@@ -229,6 +229,7 @@ class FastSpeechModel(nn.Module):
             estimated_entity = torch.exp(entity_predictor_output) - 1
             estimated_entity = estimated_entity * scale
             buckets = torch.bucketize(torch.log(estimated_entity + 1), space)
+        print(buckets.shape, buckets.min(), buckets.max())
         emb = entity_emb(buckets)
         return emb, entity_predictor_output
 
