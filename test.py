@@ -85,7 +85,7 @@ def main(config, out_file):
                                             speed=speed, 
                                             pitch=pitch, 
                                             energy=energy)
-                        path_to_save = Path(f"/kaggle/working/audios_better/{filename}.wav")                
+                        path_to_save = Path(f"/kaggle/working/audios/{filename}.wav")                
                         torchaudio.save(path_to_save, audio.unsqueeze(0), sample_rate=22050)
         
         
