@@ -21,13 +21,15 @@ DEFAULT_CHECKPOINT_PATH = ROOT_PATH / "default_test_model" / "checkpoint.pth"
 
     
 @torch.inference_mode()
-def inference(model, texts, wave_glow, device):
+def inference(model, texts, wave_glow, device, **kwargs):
     model.eval()
     t = text_to_sequence(texts[1], ["english_cleaners"])
     t_len = len(t) 
     t_pos = list(np.pad([i+1 for i in range(int(t_len))], (0, 0), 'constant'))
     t_pos = torch.from_numpy(np.array(t_pos))
-    mel_out = model(src_seq=torch.tensor(t).to(device).unsqueeze(0), src_pos=t_pos.to(device).unsqueeze(0))["mel_output"]
+    mel_out = model(src_seq=torch.tensor(t).to(device).unsqueeze(0),
+                    src_pos=t_pos.to(device).unsqueeze(0), 
+                    alpha=kwargs["speed"], beta=kwargs["pitch"], gamma=kwargs["energy"])["mel_output"]
     mel = mel_out[0, ...]
     mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
     audio = get_wav(mel, wave_glow)
@@ -66,17 +68,25 @@ def main(config, out_file):
         "Massachusetts Institute of Technology may be best known for its math, science and engineering education",
         "Wasserstein distance or Kantorovich Rubinstein metric is a distance function defined between probability distributions on a given metric space",
     ]
-    with torch.no_grad():
-        audios = []
-        for text in enumerate(tqdm(testing)):
-            audio = inference(model, text, WaveGlow, device)
-            audios += [audio]
-
-    i = 0
-    for audio in audios:
-        path_to_save = Path(f"/kaggle/working/{i}.wav")
-        torchaudio.save(path_to_save, audio.unsqueeze(0), sample_rate=22050)
-        i += 1
+    speeds = [0.8, 1, 1.2]
+    pithces = [0.8, 1, 1.2]
+    energies = [0.8, 1, 1.2]
+    for speed in speeds:
+        for pitch in pithces:
+            for energy in energies:
+                filename = f'{speed}_{pitch}_{energy}'
+                with torch.no_grad():
+                    audios = []
+                    for text in enumerate(tqdm(testing)):
+                        audio = inference(model,
+                                          text,
+                                          WaveGlow,
+                                          device, 
+                                          speed=speed, 
+                                          pitch=pitch, 
+                                          energy=energy)
+                        path_to_save = Path(f"/kaggle/working/{filename}.wav")                
+                        torchaudio.save(path_to_save, audio.unsqueeze(0), sample_rate=22050)
             
         
 
