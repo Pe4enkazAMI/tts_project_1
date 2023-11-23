@@ -71,23 +71,23 @@ def main(config, out_file):
     speeds = [0.8, 1, 1.2]
     pithces = [0.8, 1, 1.2]
     energies = [0.8, 1, 1.2]
-    for speed in speeds:
-        for pitch in pithces:
-            for energy in energies:
-                filename = f'{speed}_{pitch}_{energy}'
-                with torch.no_grad():
-                    audios = []
-                    for text in enumerate(tqdm(testing)):
+    with torch.no_grad():
+        for text in enumerate(tqdm(testing)):
+            for speed in speeds:
+                for pitch in pithces:
+                    for energy in energies:
+                        filename = f'{speed}_{pitch}_{energy}'
+
                         audio = inference(model,
-                                          text,
-                                          WaveGlow,
-                                          device, 
-                                          speed=speed, 
-                                          pitch=pitch, 
-                                          energy=energy)
+                                            text,
+                                            WaveGlow,
+                                            device, 
+                                            speed=speed, 
+                                            pitch=pitch, 
+                                            energy=energy)
                         path_to_save = Path(f"/kaggle/working/{filename}.wav")                
                         torchaudio.save(path_to_save, audio.unsqueeze(0), sample_rate=22050)
-            
+        
         
 
 if __name__ == "__main__":
