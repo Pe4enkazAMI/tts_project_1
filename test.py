@@ -43,6 +43,9 @@ def main(config, out_file):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
     # setup data_loader instances
+    writer = get_visualizer(
+    config, logger, "wandb"
+    )      
 
     # build model architecture
     model = config.init_obj(config["arch"], module_model)
@@ -84,9 +87,8 @@ def main(config, out_file):
                                             device, 
                                             speed=speed, 
                                             pitch=pitch, 
-                                            energy=energy)
-                        path_to_save = Path(f"/kaggle/working/audios/{filename}.wav")                
-                        torchaudio.save(path_to_save, audio.unsqueeze(0), sample_rate=22050)
+                                            energy=energy)               
+                        writer.add_audio(f"{filename}", audio, sample_rate=22050)
         
         
 
