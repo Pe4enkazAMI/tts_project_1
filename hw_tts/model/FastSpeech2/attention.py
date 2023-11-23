@@ -43,6 +43,8 @@ class MultiHeadAttention(nn.Module):
         else F.scaled_dot_product_attention
         self.layer_norm = nn.LayerNorm(d_model)
 
+        self.fc = nn.Linear(n_head * d_v, d_model) # <-- fucking legacy 
+        nn.init.xavier_normal_(self.fc.weight) # <-- fucking legacy 
         self.dropout = nn.Dropout(dropout)
         
         self.reset_parameters()
