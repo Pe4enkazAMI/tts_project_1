@@ -76,7 +76,7 @@ def main(config, out_file):
             for speed in speeds:
                 for pitch in pithces:
                     for energy in energies:
-                        filename = f'{speed}_{pitch}_{energy}'
+                        filename = f'{text[:5]}_{speed}_{pitch}_{energy}'
 
                         audio = inference(model,
                                             text,
