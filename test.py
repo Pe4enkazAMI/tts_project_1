@@ -7,10 +7,7 @@ import torch
 from tqdm import tqdm
 
 import hw_tts.model as module_model
-from hw_tts.logger import get_visualizer
-from hw_tts.trainer import Trainer
-from hw_tts.utils import ROOT_PATH, MetricTracker, get_WaveGlow
-from hw_tts.utils.object_loading import get_dataloaders
+from hw_tts.utils import ROOT_PATH, get_WaveGlow
 from hw_tts.utils.parse_config import ConfigParser
 from hw_tts.text import text_to_sequence
 from waveglownet.inference import get_wav
@@ -39,15 +36,9 @@ def inference(model, texts, wave_glow, device, **kwargs):
 def main(config, out_file):
     logger = config.get_logger("test")
 
-    # define cpu or gpu if possible
+    
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # setup data_loader instances
-    writer = get_visualizer(
-    config, logger, "wandb"
-    )      
-
-    # build model architecture
     model = config.init_obj(config["arch"], module_model)
     logger.info(model)
 
@@ -58,7 +49,6 @@ def main(config, out_file):
         model = torch.nn.DataParallel(model)
     model.load_state_dict(state_dict)
 
-    # prepare model for testing
     print(device)
     model = model.to(device)
     model.eval()
@@ -144,15 +134,6 @@ if __name__ == "__main__":
         type=int,
         help="Number of workers for test dataloader",
     )
-    args.add_argument(
-        '-tts',
-        '--test_texts',
-        default="FUCK ME HARD",
-        type=str,
-        help="Text to generate"
-
-    )
-
     args = args.parse_args()
 
     # set GPUs
@@ -191,8 +172,5 @@ if __name__ == "__main__":
             }
         }
 
-    # assert config.config.get("data", {}).get("test", None) is not None
-    # config["data"]["test"]["batch_size"] = args.batch_size
-    # config["data"]["test"]["n_jobs"] = args.jobs
 
     main(config, args.output)

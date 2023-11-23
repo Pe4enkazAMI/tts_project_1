@@ -1,6 +1,7 @@
 import numpy as np
 import torch
 from torch import nn
+import torch.nn.functional as F
 
 
 class ScaledDotProductAttention(nn.Module):
@@ -25,24 +26,22 @@ class ScaledDotProductAttention(nn.Module):
 class MultiHeadAttention(nn.Module):
     ''' Multi-Head Attention module '''
 
-    def __init__(self, n_head, d_model, d_k, d_v, dropout=0.1):
+    def __init__(self, n_head, d_model, d_k, d_v, dropout=0.1, use_flash=False):
         super().__init__()
 
-        self.n_head = n_head # num head
-        self.d_k = d_k # litteraly head_dim
-        self.d_v = d_v # literally head_dim 
-        self.d_model = d_model # emb dim
+        self.n_head = n_head 
+        self.d_k = d_k 
+        self.d_v = d_v 
+        self.d_model = d_model 
+        self.use_flash = use_flash
 
-        # new____________________________________________
         self.qkv = nn.Linear(self.d_model, 3*self.d_model)
         self.out = nn.Linear(self.d_model, self.d_model)
-        #________________________________________________
+        
 
-        self.attention = ScaledDotProductAttention(temperature=d_k**0.5) 
+        self.attention = ScaledDotProductAttention(temperature=d_k**0.5) if not self.use_flash \
+        else F.scaled_dot_product_attention
         self.layer_norm = nn.LayerNorm(d_model)
-
-        self.fc = nn.Linear(n_head * d_v, d_model)
-        nn.init.xavier_normal_(self.fc.weight)
 
         self.dropout = nn.Dropout(dropout)
         
@@ -66,7 +65,12 @@ class MultiHeadAttention(nn.Module):
         if mask is not None:
             mask = mask.unsqueeze(1).repeat(1, self.n_head, 1, 1)   # b x n x .. x ..
 
-        output, attn = self.attention(q, k, v, mask=mask)
+
+        if self.use_flash:
+            with torch.backends.cuda.enable_flash_sdp():
+                output, attn = self.attention(q, k, v, attn_mask=mask), None
+        else:
+            output, attn = self.attention(q, k, v, mask=mask)
         output = output.permute(0, 2, 1, 3)
         output = output.reshape(bs, seq_len, self.d_model)
         output = self.dropout(self.out(output))

@@ -1,7 +1,6 @@
 import argparse
 import collections
 import warnings
-#jopa
 import numpy as np
 import torch
 

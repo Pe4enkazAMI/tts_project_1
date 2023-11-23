@@ -13,23 +13,7 @@
             "decoder_dim": 256,
             "decoder_n_layer": 4,
             "decoder_head": 2,
-            "decoder_filter_size": 1024,
-            "fft_kernel": [9, 1],
-            "fft_padding": [4, 0],
-            "duration_predictor_filter_size": 256,
-            "duration_predictor_kernel_size": 3,
-            "pitch_predictor_filter_size": 256,
-            "pitch_predictor_kernel_size": 3,
-            "energy_predictor_filter_size": 256,
-            "energy_predictor_kernel_size": 3,
-            "dropout": 0.1,
-            "PAD": 0,
-            "num_mels": 80,
-            "min_pitch": 59.913448819015024,
-            "max_pitch": 887.2688230720693,
-            "min_energy": 15.023643,
-            "max_energy": 91.4197,
-            "num_bins": 256
+            "decoder_filter_size": 1024
         }
     },
     "data": {
@@ -54,7 +38,8 @@
         }
     },
     "test_texts": ["My name is Kirill Korolev and i am going to smash your head with my precious hammer",
-                   "English you speak it motherfucker", "pull up on the tank and e ya edu v boi" ],
+                   "English you speak it motherfucker", 
+                   "pull up on the tank and e ya edu v boi" ],
     "optimizer": {
         "type": "AdamW",
         "args": {

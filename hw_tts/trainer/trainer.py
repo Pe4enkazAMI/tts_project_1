@@ -1,15 +1,9 @@
-import imp
-import os
 import random
 from pathlib import Path
 from random import shuffle
 from typing import Optional
-import numpy as np
-import pandas as pd
 import PIL
 import torch
-import torch.nn.functional as F
-import torchaudio
 from hw_tts.base import BaseTrainer
 from hw_tts.logger.utils import plot_spectrogram_to_buf
 from hw_tts.utils import ROOT_PATH, MetricTracker, inf_loop, get_WaveGlow
@@ -17,7 +11,7 @@ from torch.nn.utils import clip_grad_norm_
 from torchvision.transforms import ToTensor
 from tqdm import tqdm
 from waveglownet.inference import get_wav
-import hw_tts.text as text
+
 
 
 class Trainer(BaseTrainer):
@@ -183,33 +177,7 @@ class Trainer(BaseTrainer):
         mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
         audio = get_wav(mel, self.WaveGlow)
         return audio
-    
-    def make_src_pos_for_inference(self, texts):
-        length_text = np.array([])
-        length_text = np.append(length_text, texts.size(0))
-        src_pos = list()
-        max_len = int(max(length_text))
-        for length_src_row in length_text:
-            src_pos.append(np.pad([i+1 for i in range(int(length_src_row))],
-                              (0, max_len-int(length_src_row)), 'constant'))
-        src_pos = torch.from_numpy(np.array(src_pos))
-        return {"src_seq_inference": texts, "src_pos_inference": src_pos}
-    
-    @torch.inference_mode()
-    def inference(self, texts):
-        self.model.eval()
-        audios = []
-        for i in range(len(texts)):
-            t = text.text_to_sequence(texts[i], ["english_cleaners"])
-            inference_batch = self.make_src_pos_for_inference(t)
-            mel_out = self.model(src_seq=inference_batch["src_seq_inference"],
-                             src_pos=inference_batch["src_pos_inference"])["mel_output"]
-            mel = mel_out[i, ...]
-            mel = mel.contiguous().transpose(-1, -2).unsqueeze(0)
-            audio = get_wav(mel, self.WaveGlow)
-            audios += audio
-        return audios 
-
+        
     def _log_predictions(
             self,
             src_seq,
