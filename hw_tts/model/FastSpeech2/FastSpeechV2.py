@@ -223,13 +223,15 @@ class FastSpeechModel(nn.Module):
     def get_entity(self, x, predictor, space, entity_emb, target=None, scale=1.0):
         entity_predictor_output = predictor(x)
 
+        max_val = entity_emb.num_embeddings
         if target is not None:
-            buckets = torch.bucketize(torch.log(target + 1), space)
+            buckets = torch.bucketize(torch.log1p(target), space)
         else:
             estimated_entity = torch.exp(entity_predictor_output) - 1
             estimated_entity = estimated_entity * scale
-            buckets = torch.bucketize(torch.log(estimated_entity + 1), space)
-        print(buckets.shape, buckets.min(), buckets.max())
+            buckets = torch.bucketize(torch.log1p(estimated_entity), space)
+        
+        buckets = torch.clip(buckets, min=0, max=max_val - 1)
         emb = entity_emb(buckets)
         return emb, entity_predictor_output
 
